@@ -43,8 +43,12 @@ const InfoBlock = styled.div`
   }
 `
 
+const unfinishedProjectStatus = "Sin terminar"
+
 const Project = ({ data: { mdx: postNode }, location }) => {
   const project = postNode.frontmatter
+  const date = new Date(project.date).toLocaleDateString('es-MX', {month: 'long', year: 'numeric'})
+  console.log(project)
 
   const titleProps = useSpring({
     config: config.slow,
@@ -67,17 +71,26 @@ const Project = ({ data: { mdx: postNode }, location }) => {
           </Title>
           <InformationWrapper style={infoProps}>
             <InfoBlock customcolor={project.color}>
-              <div>Client</div>
+              <div>Cliente</div>
               <div>{project.client}</div>
             </InfoBlock>
+            {project.status !== unfinishedProjectStatus &&
+              <InfoBlock customcolor={project.color}>
+                <div>Fecha</div>
+                <div>{date}</div>
+              </InfoBlock>
+            }
+            
             <InfoBlock customcolor={project.color}>
-              <div>Date</div>
-              <div>{project.date}</div>
-            </InfoBlock>
-            <InfoBlock customcolor={project.color}>
-              <div>Service</div>
+              <div>Servicio</div>
               <div>{project.service}</div>
             </InfoBlock>
+            {project.status && (
+              <InfoBlock customcolor={project.color}>
+                <div>Estado</div>
+                <div>{project.status}</div>
+              </InfoBlock>
+            )}
           </InformationWrapper>
         </Content>
       </Hero>
@@ -117,10 +130,11 @@ export const pageQuery = graphql`
       }
       frontmatter {
         title
-        date(formatString: "DD.MM.YYYY")
+        date
         client
         color
         service
+        status
         cover {
           childImageSharp {
             fluid(maxWidth: 1920, quality: 90) {
